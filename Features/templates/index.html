@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Academic Content Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .input-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .output-section {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .output-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 3px solid #e9ecef;
+            margin-bottom: 25px;
+            gap: 5px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            font-size: 15px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+        }
+
+        .tab:hover {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1));
+            color: #4facfe;
+        }
+
+        .tab.active {
+            color: #4facfe;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(0, 242, 254, 0.15));
+            border-bottom: 4px solid #4facfe;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-radius: 2px;
+        }
+
+        .tab i {
+            margin-right: 8px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 40px;
+            color: #6c757d;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #4facfe, #00f2fe, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .loading p {
+            font-size: 18px;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .loading small {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Progress bar animation */
+        .loading::after {
+            content: '';
+            display: block;
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe, #667eea, #764ba2);
+            background-size: 200% 100%;
+            margin: 20px auto 0;
+            border-radius: 2px;
+            animation: loadingBar 1.5s ease infinite;
+        }
+
+        @keyframes loadingBar {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe, #667eea, #764ba2);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(79, 172, 254, 0.2);
+            border-color: #4facfe;
+        }
+
+        .result-card h3 {
+            color: #1a237e;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-card h3 i {
+            color: #4facfe;
+            font-size: 24px;
+        }
+
+        .result-card p {
+            color: #546e7a;
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .result-card p strong {
+            color: #1565c0;
+            font-weight: 700;
+        }
+
+        .download-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-download {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-download:hover {
+            background: linear-gradient(135deg, #218838 0%, #1aa179 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-download i {
+            font-size: 18px;
+        }
+
+        .chat-section {
+            grid-column: 1 / -1;
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .chat-box {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .message.user {
+            background: #e3f2fd;
+            margin-left: 20%;
+        }
+
+        .message.bot {
+            background: #f1f8e9;
+            margin-right: 20%;
+        }
+
+        .alert {
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert::before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .alert-success {
+            color: #155724;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+        }
+
+        .alert-success::before {
+            content: '\f058';
+            color: #28a745;
+        }
+
+        .alert-error {
+            color: #721c24;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-left: 5px solid #dc3545;
+        }
+
+        .alert-error::before {
+            content: '\f06a';
+            color: #dc3545;
+        }
+
+        .feedback-section {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.2);
+        }
+
+        .feedback-section h4 {
+            color: #856404;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-section h4 i {
+            color: #ffc107;
+            font-size: 18px;
+        }
+
+        .feedback-section textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .feedback-section textarea:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.2);
+        }
+
+        .syllabus-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .syllabus-info::before {
+            content: '📚';
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 48px;
+            opacity: 0.2;
+        }
+
+        .syllabus-info h3 {
+            color: #0d47a1;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .syllabus-info h3 i {
+            color: #2196f3;
+            font-size: 20px;
+        }
+
+        .syllabus-info p {
+            color: #1565c0;
+            margin: 8px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .syllabus-info p strong {
+            color: #0d47a1;
+            font-weight: 700;
+        }
+
+        /* IMPROVED CONTENT DISPLAY WITH BETTER ALIGNMENT */
+        .content-display {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 15px 0;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #2c3e50;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Custom scrollbar for content display */
+        .content-display::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .content-display::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .content-display::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 10px;
+        }
+
+        .content-display::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #3b8fe0 0%, #00d4e0 100%);
+        }
+
+        /* Enhanced formatting for lesson plan content */
+        .content-display h1, .content-display h2, .content-display h3, .content-display h4 {
+            color: #1a237e;
+            margin: 25px 0 15px 0;
+            font-weight: 700;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-image-slice: 1;
+            padding-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .content-display h1 { 
+            font-size: 28px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .content-display h2 { 
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .content-display h3 { 
+            font-size: 20px;
+            color: #34495e;
+        }
+        .content-display h4 { 
+            font-size: 18px;
+            color: #546e7a;
+        }
+
+        .content-display p {
+            margin: 12px 0;
+            text-align: justify;
+            line-height: 1.9;
+        }
+
+        .content-display strong {
+            color: #1565c0;
+            font-weight: 700;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1));
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .content-display ul, .content-display ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        .content-display li {
+            margin: 8px 0;
+            padding-left: 10px;
+            position: relative;
+        }
+
+        .content-display ul li::before {
+            content: "▸";
+            color: #4facfe;
+            font-weight: bold;
+            position: absolute;
+            left: -15px;
+        }
+
+        /* Enhanced table styling for lesson plan tables */
+        .content-display table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .content-display th, .content-display td {
+            border: 1px solid #e0e0e0;
+            padding: 16px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .content-display th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .content-display td {
+            background: #fafbfc;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .content-display tr:nth-child(even) td {
+            background: #ffffff;
+        }
+
+        .content-display tr:hover td {
+            background: #e3f2fd;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(79, 172, 254, 0.2);
+        }
+
+        /* Question numbering style */
+        .content-display .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-right: 8px;
+            font-size: 13px;
+        }
+
+        /* Module section styling */
+        .content-display .module-section {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.05), rgba(0, 242, 254, 0.05));
+            border-left: 5px solid #4facfe;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Day by day breakdown styling */
+        .content-display .day-item {
+            background: #ffffff;
+            border: 2px solid #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 12px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .content-display .day-item:hover {
+            border-color: #4facfe;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2);
+            transform: translateX(5px);
+        }
+
+        /* Assessment checkpoint styling */
+        .content-display .checkpoint {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(255, 193, 7, 0.2);
+        }
+
+        /* MCQ options styling - Enhanced for better visibility */
+        .content-display .mcq-option {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 12px 18px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .content-display .mcq-option:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-color: #4facfe;
+            transform: translateX(8px);
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+        }
+
+        /* Bold option labels (A), B), C), D)) */
+        .content-display .mcq-option strong:first-child,
+        .content-display .mcq-option b:first-child {
+            font-weight: 900;
+            color: #1565c0;
+            font-size: inherit;
+            margin-right: 8px;
+        }
+
+        .content-display .correct-answer {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+            font-weight: 600;
+            box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Better formatting for JSON content */
+        .content-display pre {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Code blocks */
+        .content-display code {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1));
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #c7254e;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+
+        /* Blockquote styling */
+        .content-display blockquote {
+            border-left: 5px solid #4facfe;
+            background: linear-gradient(90deg, rgba(79, 172, 254, 0.05), transparent);
+            padding: 15px 20px;
+            margin: 15px 0;
+            font-style: italic;
+            color: #546e7a;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Week divider */
+        .content-display .week-divider {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #4facfe, #00f2fe, transparent);
+            margin: 30px 0;
+            border-radius: 2px;
+        }
+
+        /* Topic badge */
+        .content-display .topic-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Responsive design for content display */
+        @media (max-width: 768px) {
+            .content-display {
+                padding: 20px;
+                font-size: 14px;
+            }
+            
+            .content-display table {
+                font-size: 12px;
+            }
+            
+            .content-display th, .content-display td {
+                padding: 10px 8px;
+            }
+
+            .content-display h1 { font-size: 22px; }
+            .content-display h2 { font-size: 20px; }
+            .content-display h3 { font-size: 18px; }
+            .content-display h4 { font-size: 16px; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> AI Academic Content Generator</h1>
+            <p>Generate comprehensive lesson plans, assessments, and educational content using Meta Llama 3.1 8B</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2><i class="fas fa-cogs"></i> Course Configuration</h2>
+                
+                <!-- Syllabus Information -->
+                <div class="syllabus-info">
+                    <h3><i class="fas fa-info-circle"></i> Syllabus Information</h3>
+                    <p><strong>Course:</strong> Artificial Intelligence</p>
+                    <p><strong>Modules:</strong> 5 modules covering Intelligent Agents, Problem Solving, Game Playing, Logical Agents, and Knowledge Representation</p>
+                    <p><strong>Topics:</strong> Comprehensive AI curriculum with practical case studies</p>
+                    <p><strong>Status:</strong> Pre-loaded and ready for lesson planning</p>
+                </div>
+                
+                <!-- Flash messages -->
+                <div id="alertContainer"></div>
+
+                <form id="syllabusForm">
+                    <div class="form-group">
+                        <label for="courseUnit"><i class="fas fa-book-open"></i> Select Unit/Module for Lesson Plan</label>
+                        <select id="courseUnit" name="course_unit" required>
+                            <option value="all">All Modules (Complete Course)</option>
+                            <option value="1">Module 1: Introduction to Intelligent Agents</option>
+                            <option value="2">Module 2: Problem Solving</option>
+                            <option value="3">Module 3: Game Playing</option>
+                            <option value="4">Module 4: Logical Agents</option>
+                            <option value="5">Module 5: Knowledge Representation</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="syllabusTitle"><i class="fas fa-tag"></i> Course Title</label>
+                            <input type="text" id="syllabusTitle" name="syllabus_title" 
+                                   value="Artificial Intelligence" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="availableDays"><i class="fas fa-calendar-days"></i> Available Teaching Days</label>
+                            <select id="availableDays" name="available_days" required>
+                                <option value="3">3 days per week</option>
+                                <option value="4">4 days per week</option>
+                                <option value="5" selected>5 days per week</option>
+                                <option value="6">6 days per week</option>
+                                <option value="7">7 days per week</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Assessment Configuration Section -->
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #dee2e6;">
+                        <h3 style="color: #495057; margin-bottom: 15px; font-size: 16px;">
+                            <i class="fas fa-clipboard-check"></i> Assessment Configuration
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="assessmentUnit"><i class="fas fa-book"></i> Select Unit/Module for Assessment</label>
+                            <select id="assessmentUnit" name="assessment_unit" required>
+                                <option value="all">All Modules</option>
+                                <option value="1">Module 1: Introduction to Intelligent Agents</option>
+                                <option value="2">Module 2: Problem Solving</option>
+                                <option value="3">Module 3: Game Playing</option>
+                                <option value="4">Module 4: Logical Agents</option>
+                                <option value="5">Module 5: Knowledge Representation</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mcqCount"><i class="fas fa-hashtag"></i> Number of MCQs</label>
+                                <input type="number" id="mcqCount" name="mcq_count" 
+                                       min="5" max="100" value="20" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="difficultyLevel"><i class="fas fa-signal"></i> Difficulty Level</label>
+                                <select id="difficultyLevel" name="difficulty_level" required>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="hard">Hard</option>
+                                    <option value="mixed">Mixed (Easy, Medium & Hard)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Subjective Questions Configuration Section -->
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #dee2e6;">
+                        <h3 style="color: #495057; margin-bottom: 15px; font-size: 16px;">
+                            <i class="fas fa-question-circle"></i> Subjective Questions Configuration
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="questionUnit"><i class="fas fa-book"></i> Select Unit/Module for Questions</label>
+                            <select id="questionUnit" name="question_unit">
+                                <option value="all">All Modules</option>
+                                <option value="1">Module 1: Introduction to Intelligent Agents</option>
+                                <option value="2">Module 2: Problem Solving</option>
+                                <option value="3">Module 3: Game Playing</option>
+                                <option value="4">Module 4: Logical Agents</option>
+                                <option value="5">Module 5: Knowledge Representation</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="twoMarkCount"><i class="fas fa-hashtag"></i> Number of 2-Mark Questions</label>
+                                <input type="number" id="twoMarkCount" name="two_mark_count" 
+                                       min="0" max="50" value="10">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="fiveMarkCount"><i class="fas fa-hashtag"></i> Number of 5-Mark Questions</label>
+                                <input type="number" id="fiveMarkCount" name="five_mark_count" 
+                                       min="0" max="50" value="10">
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary" onclick="generateQuestions()" style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-lightbulb"></i> Generate Questions
+                        </button>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 20px; width: 100%;">
+                        <i class="fas fa-magic"></i> Generate Lesson Plan & Assessments
+                    </button>
+                </form>
+            </div>
+
+            <div class="output-section">
+                <h2><i class="fas fa-file-alt"></i> Generated Content</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('lesson-plan')">
+                        <i class="fas fa-calendar-alt"></i> Lesson Plan
+                    </button>
+                    <button class="tab" onclick="showTab('assessments')">
+                        <i class="fas fa-clipboard-check"></i> Assessments
+                    </button>
+                    <button class="tab" onclick="showTab('questions')">
+                        <i class="fas fa-question-circle"></i> Questions
+                    </button>
+                </div>
+
+                <div id="lesson-plan" class="tab-content active">
+                    <div id="lessonPlanContent">
+                        <p style="color: #6c757d; text-align: center; padding: 40px;">
+                            <i class="fas fa-info-circle"></i><br>
+                            Configure your course settings and click "Generate" to create lesson plans
+                        </p>
+                    </div>
+                </div>
+
+                <div id="assessments" class="tab-content">
+                    <div id="assessmentsContent">
+                        <p style="color: #6c757d; text-align: center; padding: 40px;">
+                            <i class="fas fa-info-circle"></i><br>
+                            Configure your course settings and click "Generate" to create assessments
+                        </p>
+                    </div>
+                </div>
+
+                <div id="questions" class="tab-content">
+                    <div id="questionsContent">
+                        <p style="color: #6c757d; text-align: center; padding: 40px;">
+                            <i class="fas fa-info-circle"></i><br>
+                            Configure question settings on the right and click "Generate Questions"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <h2><i class="fas fa-comments"></i> AI Teaching Assistant (Meta Llama 3.1)</h2>
+            <div id="chatBox" class="chat-box">
+                <div class="message bot">
+                    <strong>AI Assistant:</strong> Hello! I'm powered by Meta Llama 3.1 8B and ready to help you refine your lesson plans and assessments. Feel free to ask questions or request modifications to the generated content.
+                </div>
+            </div>
+            <div class="chat-input-group">
+                <input type="text" id="chatInput" placeholder="Ask for refinements, teaching strategies, or guidance...">
+                <button class="btn btn-primary" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSyllabusId = null;
+        let generatedContent = {};
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Enhanced content formatting function
+        function formatLessonPlanContent(content) {
+            if (typeof content === 'object' && content.detailed_plan) {
+                content = content.detailed_plan;
+            }
+            
+            if (typeof content !== 'string') {
+                content = JSON.stringify(content, null, 2);
+            }
+
+            // Convert markdown-like formatting to HTML
+            content = content
+                // Convert **text** to <strong>text</strong>
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Highlight MCQ options (A), B), C), D)) with bold option letters
+                .replace(/^([A-D])\)(.*?)$/gm, '<div class="mcq-option"><strong>$1)</strong>$2</div>')
+                .replace(/^([a-d])\)(.*?)$/gm, '<div class="mcq-option"><strong>$1)</strong>$2</div>')
+                // Convert tables (basic markdown table support)
+                .replace(/\|(.+)\|/g, function(match, p1) {
+                    const cells = p1.split('|').map(cell => cell.trim());
+                    if (cells.some(cell => cell.includes('---'))) {
+                        return '<tr>' + cells.map(cell => '<th>' + cell.replace(/---/g, '') + '</th>').join('') + '</tr>';
+                    } else {
+                        return '<tr>' + cells.map(cell => '<td>' + cell + '</td>').join('') + '</tr>';
+                    }
+                })
+                // Convert line breaks
+                .replace(/\n/g, '<br>');
+
+            // Wrap tables
+            if (content.includes('<tr>')) {
+                content = content.replace(/(<tr>.*?<\/tr>)/gs, '<table>$1</table>');
+            }
+
+            return content;
+        }
+
+        // Form submission
+        document.getElementById('syllabusForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Show loading
+            showLoading();
+            
+            try {
+                const response = await fetch('/generate_content', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentSyllabusId = result.syllabus_id;
+                    generatedContent = result;
+                    displayResults(result);
+                    showAlert('Content generated successfully using Meta Llama 3.1!', 'success');
+                } else {
+                    // Hide loading and show error
+                    document.getElementById('resultsContainer').innerHTML = '';
+                    showAlert('Error: ' + result.error, 'error');
+                }
+            } catch (error) {
+                // Hide loading and show error
+                document.getElementById('resultsContainer').innerHTML = '';
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        });
+
+        function showLoading() {
+            const loadingHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Generating content with Meta Llama 3.1 8B...</p>
+                    <small>This may take a few moments</small>
+                </div>
+            `;
+            
+            document.getElementById('lessonPlanContent').innerHTML = loadingHTML;
+            document.getElementById('assessmentsContent').innerHTML = loadingHTML;
+            document.getElementById('questionsContent').innerHTML = loadingHTML;
+        }
+
+        function displayResults(data) {
+            // Get the selected course unit
+            const selectedCourseUnit = document.getElementById('courseUnit').value;
+            const courseUnitText = document.getElementById('courseUnit').options[document.getElementById('courseUnit').selectedIndex].text;
+            
+            // Format and display lesson plan with improved alignment
+            const formattedContent = formatLessonPlanContent(data.lesson_plan.detailed_plan || data.lesson_plan);
+            
+            const lessonPlanHTML = `
+                <div class="result-card">
+                    <h3><i class="fas fa-calendar-week"></i> Weekly Lesson Plan</h3>
+                    <p><strong>Selected Unit:</strong> ${courseUnitText}</p>
+                    <p><strong>Duration:</strong> ${data.lesson_plan.total_weeks || 'N/A'} weeks</p>
+                    <p><strong>Available Days:</strong> ${data.lesson_plan.available_days || 'N/A'} days per week</p>
+                    
+                    <div class="content-display">
+                        ${formattedContent}
+                    </div>
+                    
+                    <div class="feedback-section">
+                        <h4><i class="fas fa-comment-dots"></i> Provide Feedback</h4>
+                        <textarea id="lessonFeedback" placeholder="Share your thoughts on this lesson plan..."></textarea>
+                        <button class="btn btn-secondary" onclick="refineLessonPlan()">
+                            <i class="fas fa-edit"></i> Refine Plan
+                        </button>
+                    </div>
+                    
+                    <div class="download-buttons">
+                        <a href="/download/pdf/lesson_plan/${data.syllabus_id}" class="btn-download">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </a>
+                        <a href="/download/docx/lesson_plan/${data.syllabus_id}" class="btn-download">
+                            <i class="fas fa-file-word"></i> Download DOCX
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('lessonPlanContent').innerHTML = lessonPlanHTML;
+
+            // Display assessments based on selected difficulty level
+            let assessmentHTML = '';
+            const selectedDifficulty = document.getElementById('difficultyLevel').value;
+            const selectedMcqCount = document.getElementById('mcqCount').value;
+            const selectedUnit = document.getElementById('assessmentUnit').value;
+            
+            // Determine which levels to display
+            let levelsToDisplay = [];
+            if (selectedDifficulty === 'mixed') {
+                levelsToDisplay = ['easy', 'medium', 'hard'];
+            } else {
+                levelsToDisplay = [selectedDifficulty];
+            }
+            
+            // Display configuration info
+            assessmentHTML += `
+                <div class="result-card" style="background: #e8f4f8; border: 2px solid #4facfe;">
+                    <h3><i class="fas fa-info-circle"></i> Assessment Configuration</h3>
+                    <p><strong>Selected Unit:</strong> ${selectedUnit === 'all' ? 'All Modules' : 'Module ' + selectedUnit}</p>
+                    <p><strong>Number of MCQs:</strong> ${selectedMcqCount}</p>
+                    <p><strong>Difficulty Level:</strong> ${selectedDifficulty === 'mixed' ? 'Mixed (Easy, Medium & Hard)' : selectedDifficulty.toUpperCase()}</p>
+                </div>
+            `;
+            
+            // Display only the selected difficulty levels
+            levelsToDisplay.forEach(level => {
+                if (data.assessments && data.assessments[level]) {
+                    const formattedAssessment = formatLessonPlanContent(data.assessments[level]);
+                    assessmentHTML += `
+                        <div class="result-card">
+                            <h3><i class="fas fa-star${level === 'easy' ? '' : level === 'medium' ? '-half-alt' : 's'}"></i> ${level.toUpperCase()} Level Assessment</h3>
+                            <div class="content-display">
+                                ${formattedAssessment}
+                            </div>
+                            
+                            <div class="feedback-section">
+                                <textarea id="${level}Feedback" placeholder="Feedback for ${level} level assessment..."></textarea>
+                                <button class="btn btn-secondary" onclick="refineAssessment('${level}')">
+                                    <i class="fas fa-edit"></i> Refine Assessment
+                                </button>
+                                <button class="btn btn-primary" onclick="createQuiz('${level}', '${level.toUpperCase()} Level Quiz')" style="margin-left: 10px;">
+                                    <i class="fas fa-clipboard-list"></i> Create Quiz Link
+                                </button>
+                            </div>
+                            
+                            <div id="quiz-link-${level}" style="display: none; margin-top: 15px; padding: 15px; background: #e8f5e9; border-radius: 8px; border: 2px solid #4caf50;">
+                                <h4 style="color: #2e7d32; margin-bottom: 10px;"><i class="fas fa-link"></i> Quiz Created Successfully!</h4>
+                                <p><strong>Student Quiz Link:</strong></p>
+                                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                    <input type="text" id="quiz-url-${level}" readonly style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                    <button class="btn btn-secondary" onclick="copyToClipboard('quiz-url-${level}')">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <p><strong>View Results:</strong></p>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="results-url-${level}" readonly style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                    <button class="btn btn-secondary" onclick="copyToClipboard('results-url-${level}')">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                    <a id="results-link-${level}" href="#" target="_blank" class="btn btn-primary">
+                                        <i class="fas fa-chart-bar"></i> View Results
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            // If no assessments were found
+            if (levelsToDisplay.every(level => !data.assessments || !data.assessments[level])) {
+                assessmentHTML += `
+                    <div class="result-card">
+                        <p style="color: #6c757d; text-align: center; padding: 20px;">
+                            <i class="fas fa-exclamation-triangle"></i><br>
+                            No assessments generated for the selected difficulty level(s).
+                        </p>
+                    </div>
+                `;
+            }
+            
+            assessmentHTML += `
+                <div class="download-buttons">
+                    <a href="/download/pdf/assessments/${data.syllabus_id}" class="btn-download">
+                        <i class="fas fa-file-pdf"></i> Download Assessments PDF
+                    </a>
+                    <a href="/download/docx/assessments/${data.syllabus_id}" class="btn-download">
+                        <i class="fas fa-file-word"></i> Download Assessments DOCX
+                    </a>
+                </div>
+            `;
+            
+            document.getElementById('assessmentsContent').innerHTML = assessmentHTML;
+        }
+
+        // Generate subjective questions function
+        async function generateQuestions() {
+            const questionUnit = document.getElementById('questionUnit').value;
+            const twoMarkCount = parseInt(document.getElementById('twoMarkCount').value) || 0;
+            const fiveMarkCount = parseInt(document.getElementById('fiveMarkCount').value) || 0;
+            
+            if (twoMarkCount === 0 && fiveMarkCount === 0) {
+                showAlert('Please specify at least one question type to generate.', 'error');
+                return;
+            }
+            
+            if (!generatedContent || !generatedContent.preprocessed_data) {
+                showAlert('Please generate lesson plan and assessments first.', 'error');
+                return;
+            }
+            
+            // Show loading in questions tab
+            document.getElementById('questionsContent').innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Generating subjective questions...</p>
+                    <small>This may take a few moments</small>
+                </div>
+            `;
+            
+            // Switch to questions tab
+            showTab('questions');
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab')[2].classList.add('active');
+            
+            try {
+                const formData = new FormData();
+                formData.append('question_unit', questionUnit);
+                formData.append('two_mark_count', twoMarkCount);
+                formData.append('five_mark_count', fiveMarkCount);
+                formData.append('syllabus_id', currentSyllabusId || '');
+                
+                const response = await fetch('/generate_questions', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayQuestions(result, questionUnit, twoMarkCount, fiveMarkCount);
+                    showAlert('Questions generated successfully!', 'success');
+                } else {
+                    showAlert('Error: ' + result.error, 'error');
+                    document.getElementById('questionsContent').innerHTML = `
+                        <p style="color: #dc3545; text-align: center; padding: 40px;">
+                            <i class="fas fa-exclamation-circle"></i><br>
+                            Error generating questions: ${result.error}
+                        </p>
+                    `;
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+                document.getElementById('questionsContent').innerHTML = `
+                    <p style="color: #dc3545; text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-circle"></i><br>
+                        Network error: ${error.message}
+                    </p>
+                `;
+            }
+        }
+        
+        // Display generated questions
+        function displayQuestions(data, questionUnit, twoMarkCount, fiveMarkCount) {
+            const unitText = questionUnit === 'all' ? 'All Modules' : 'Module ' + questionUnit;
+            
+            let questionsHTML = `
+                <div class="result-card" style="background: #e8f4f8; border: 2px solid #4facfe;">
+                    <h3><i class="fas fa-info-circle"></i> Questions Configuration</h3>
+                    <p><strong>Selected Unit:</strong> ${unitText}</p>
+                    <p><strong>2-Mark Questions:</strong> ${twoMarkCount}</p>
+                    <p><strong>5-Mark Questions:</strong> ${fiveMarkCount}</p>
+                </div>
+            `;
+            
+            // Display 2-mark questions
+            if (twoMarkCount > 0 && data.two_mark_questions) {
+                const formatted2Mark = formatLessonPlanContent(data.two_mark_questions);
+                questionsHTML += `
+                    <div class="result-card">
+                        <h3><i class="fas fa-list-ol"></i> 2-Mark Questions</h3>
+                        <div class="content-display">
+                            ${formatted2Mark}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Display 5-mark questions
+            if (fiveMarkCount > 0 && data.five_mark_questions) {
+                const formatted5Mark = formatLessonPlanContent(data.five_mark_questions);
+                questionsHTML += `
+                    <div class="result-card">
+                        <h3><i class="fas fa-list-ol"></i> 5-Mark Questions</h3>
+                        <div class="content-display">
+                            ${formatted5Mark}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('questionsContent').innerHTML = questionsHTML;
+        }
+
+        // Refinement functions
+        async function refineLessonPlan() {
+            const feedback = document.getElementById('lessonFeedback').value;
+            if (!feedback.trim()) {
+                showAlert('Please provide feedback before refining.', 'error');
+                return;
+            }
+            
+            await refineContent(generatedContent.lesson_plan, feedback, 'lesson plan');
+        }
+
+        async function refineAssessment(level) {
+            const feedback = document.getElementById(level + 'Feedback').value;
+            if (!feedback.trim()) {
+                showAlert('Please provide feedback before refining.', 'error');
+                return;
+            }
+            
+            await refineContent(generatedContent.assessments[level], feedback, `${level} assessment`);
+        }
+
+        async function refineContent(content, feedback, contentType) {
+            try {
+                const response = await fetch('/refine_content', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: typeof content === 'object' ? JSON.stringify(content) : content,
+                        feedback: feedback,
+                        content_type: contentType
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Add refined content to chat
+                    addMessageToChat('You', `Refinement request for ${contentType}: ${feedback}`, 'user');
+                    addMessageToChat('AI Assistant', result.refined_content, 'bot');
+                    showAlert('Refinement suggestions added to chat!', 'success');
+                } else {
+                    showAlert('Error refining content: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Create Quiz function
+        async function createQuiz(level, title) {
+            if (!generatedContent || !generatedContent.assessments || !generatedContent.assessments[level]) {
+                showAlert('No assessment content found for this level', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/create_quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        assessment_content: generatedContent.assessments[level],
+                        title: title
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Use port 5002 for quiz URLs
+                    const quizUrl = `http://localhost:5002/quiz/${result.quiz_code}`;
+                    const resultsUrl = `http://localhost:5002/quiz/${result.quiz_code}/results`;
+                    
+                    // Display quiz links
+                    document.getElementById(`quiz-link-${level}`).style.display = 'block';
+                    document.getElementById(`quiz-url-${level}`).value = quizUrl;
+                    document.getElementById(`results-url-${level}`).value = resultsUrl;
+                    document.getElementById(`results-link-${level}`).href = resultsUrl;
+                    
+                    showAlert(`Quiz created successfully! ${result.question_count} questions ready.`, 'success');
+                } else {
+                    showAlert('Error creating quiz: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error.message, 'error');
+            }
+        }
+        
+        // Copy to clipboard function
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            element.setSelectionRange(0, 99999); // For mobile devices
+            
+            navigator.clipboard.writeText(element.value).then(() => {
+                showAlert('Link copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                document.execCommand('copy');
+                showAlert('Link copied to clipboard!', 'success');
+            });
+        }
+        
+        // Chat functionality
+       async function sendMessage() {
+           const input = document.getElementById('chatInput');
+           const message = input.value.trim();
+           
+           if (!message) return;
+           
+           // Add user message
+           addMessageToChat('You', message, 'user');
+           input.value = '';
+           
+           try {
+               const response = await fetch('/chat', {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json',
+                   },
+                   body: JSON.stringify({
+                       message: message,
+                       context: currentSyllabusId ? `Syllabus ID: ${currentSyllabusId}` : ''
+                   })
+               });
+               
+               const result = await response.json();
+               
+               if (result.success) {
+                   addMessageToChat('AI Assistant', result.response, 'bot');
+               } else {
+                   addMessageToChat('AI Assistant', 'Sorry, I encountered an error: ' + result.error, 'bot');
+               }
+           } catch (error) {
+               addMessageToChat('AI Assistant', 'Network error: ' + error.message, 'bot');
+           }
+       }
+
+       function addMessageToChat(sender, message, type) {
+           const chatBox = document.getElementById('chatBox');
+           const messageDiv = document.createElement('div');
+           messageDiv.className = `message ${type}`;
+           messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+           chatBox.appendChild(messageDiv);
+           chatBox.scrollTop = chatBox.scrollHeight;
+       }
+
+       // Allow Enter key to send message
+       document.getElementById('chatInput').addEventListener('keypress', function(e) {
+           if (e.key === 'Enter') {
+               sendMessage();
+           }
+       });
+
+       // Alert functionality
+       function showAlert(message, type) {
+           const alertContainer = document.getElementById('alertContainer');
+           const alertDiv = document.createElement('div');
+           alertDiv.className = `alert alert-${type}`;
+           alertDiv.textContent = message;
+           
+           alertContainer.innerHTML = '';
+           alertContainer.appendChild(alertDiv);
+           
+           // Auto-hide after 5 seconds
+           setTimeout(() => {
+               alertDiv.remove();
+           }, 5000);
+       }
+   </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results - Teacher View</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .quiz-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .submissions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .submissions-table thead {
+            background: #4facfe;
+            color: white;
+        }
+
+        .submissions-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .submissions-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .submissions-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .score-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .score-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .score-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .no-submissions {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .no-submissions i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .refresh-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-bar"></i> Quiz Results Dashboard</h1>
+            <div class="quiz-info">
+                <div>
+                    <strong>Quiz:</strong> {{ title }}
+                </div>
+                <div>
+                    <strong>Quiz Code:</strong> {{ quiz_code }}
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            {% if submissions %}
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-number">{{ submissions|length }}</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div class="stat-number">
+                        {% set avg_score = (submissions|sum(attribute='score') / submissions|length)|round(1) %}
+                        {{ avg_score }}
+                    </div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-trophy"></i>
+                    <div class="stat-number">
+                        {{ ((submissions|selectattr('score', 'ge', submissions[0].total * 0.8)|list|length / submissions|length) * 100)|round(0) }}%
+                    </div>
+                    <div class="stat-label">Pass Rate (≥80%)</div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Student Submissions</h2>
+            <table class="submissions-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student Name</th>
+                        <th>Score</th>
+                        <th>Percentage</th>
+                        <th>Submitted At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for submission in submissions %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><i class="fas fa-user-circle"></i> {{ submission.student_name }}</td>
+                        <td>{{ submission.score }} / {{ submission.total }}</td>
+                        <td>
+                            {% set percentage = (submission.score / submission.total * 100)|round(1) %}
+                            <span class="score-badge {% if percentage >= 80 %}score-high{% elif percentage >= 60 %}score-medium{% else %}score-low{% endif %}">
+                                {{ percentage }}%
+                            </span>
+                        </td>
+                        <td><i class="fas fa-clock"></i> {{ submission.submitted_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-submissions">
+                <i class="fas fa-inbox"></i>
+                <h2>No Submissions Yet</h2>
+                <p>Students haven't submitted any responses yet. Share the quiz link with your students!</p>
+            </div>
+            {% endif %}
+
+            <button class="refresh-btn" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt"></i> Refresh Results
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh every 30 seconds
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>

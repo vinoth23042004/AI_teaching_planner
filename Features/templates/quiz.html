@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .student-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .student-info label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        .student-info input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .student-info input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .question-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: #4facfe;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #4facfe;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: #212529;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            border-color: #4facfe;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .option input[type="radio"]:checked + label {
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-clipboard-list"></i> {{ title }}</h1>
+            <p>Answer all questions and submit your quiz</p>
+        </div>
+
+        <div class="content">
+            <form method="POST" action="/submit_quiz/{{ quiz_code }}" onsubmit="return validateForm()">
+                <div class="student-info">
+                    <label for="student_name">
+                        <i class="fas fa-user"></i> Your Name (Required)
+                    </label>
+                    <input type="text" id="student_name" name="student_name" required 
+                           placeholder="Enter your full name">
+                </div>
+
+                {% for question in questions %}
+                <div class="question-card">
+                    <span class="question-number">Question {{ question.number }}</span>
+                    <div class="question-text">{{ question.question }}</div>
+                    
+                    <div class="options">
+                        {% for option in question.options %}
+                        <div class="option">
+                            <input type="radio" 
+                                   id="q{{ question.index }}_opt{{ option.index }}" 
+                                   name="question_{{ question.index }}" 
+                                   value="{{ option.letter }}"
+                                   required>
+                            <label for="q{{ question.index }}_opt{{ option.index }}">
+                                {{ option.letter }}. {{ option.text }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Quiz
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            const studentName = document.getElementById('student_name').value.trim();
+            if (!studentName) {
+                alert('Please enter your name before submitting the quiz.');
+                return false;
+            }
+            
+            // Check if all questions are answered
+            const totalQuestions = {{ questions|length }};
+            for (let i = 0; i < totalQuestions; i++) {
+                const answered = document.querySelector(`input[name="question_${i}"]:checked`);
+                if (!answered) {
+                    alert(`Please answer question ${i + 1} before submitting.`);
+                    return false;
+                }
+            }
+            
+            return confirm('Are you sure you want to submit your quiz? You cannot change your answers after submission.');
+        }
+    </script>
+</body>
+</html>

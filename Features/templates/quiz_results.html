@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+        }
+
+        .header i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .student-name {
+            font-size: 1.5rem;
+            color: #495057;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .score-number {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .percentage {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .message {
+            font-size: 1.2rem;
+            color: #495057;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .success-icon {
+            color: #28a745;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-check-circle"></i>
+            <h1>Quiz Submitted Successfully!</h1>
+        </div>
+
+        <div class="content">
+            <div class="student-name">
+                <i class="fas fa-user"></i> {{ student_name }}
+            </div>
+
+            <div class="score-display">
+                <div class="score-number">{{ score }} / {{ total }}</div>
+                <div class="score-text">Correct Answers</div>
+                <div class="percentage">{{ percentage }}%</div>
+            </div>
+
+            <div class="success-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+
+            <div class="message">
+                {% if percentage >= 80 %}
+                    Excellent work! You've demonstrated a strong understanding of the material.
+                {% elif percentage >= 60 %}
+                    Good job! You're on the right track. Keep studying!
+                {% elif percentage >= 40 %}
+                    Not bad, but there's room for improvement. Review the material and try again.
+                {% else %}
+                    Keep practicing! Don't give up, and make sure to review the topics carefully.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
